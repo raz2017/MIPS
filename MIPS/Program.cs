@@ -13,7 +13,13 @@ namespace MIPS
     {
         static void Main(string[] args)
         {
-             InstructionsIO.ReadInstructionsFromFile();
+             
+            PipeLinedDataPath pipe = new PipeLinedDataPath(new Instructions());
+
+
+
+
+
         }
     }
 }

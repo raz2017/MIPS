@@ -9,15 +9,18 @@ using System.Reflection;
 
 namespace MIPS
 {
-    public static class InstructionsIO
+    public class Instructions
     {
-        public static void ReadInstructionsFromFile()
+        private static List<int> _instructions;
+
+        public Instructions()
+        {
+            ReadInstructionsFromFile();
+        }
+        private void ReadInstructionsFromFile()
         {
             var assembly = Assembly.GetExecutingAssembly();
             var resourceName = ConfigurationManager.AppSettings["MIPSInstructions"] ;
-            List<int> instructions = new List<int>();
-
-        
 
             using (Stream stream = assembly.GetManifestResourceStream(resourceName))
             {
@@ -25,7 +28,7 @@ namespace MIPS
                 {
                     while (!reader.EndOfStream)
                     {
-                        instructions.Add(Convert.ToInt16(reader.Read()));
+                        _instructions.Add(Convert.ToInt16(reader.Read()));
                     }
                 }
             }
@@ -36,5 +39,14 @@ namespace MIPS
         {
             
         }
+
+        public List<int> mipsInstructions
+        {
+            get
+            {
+                return _instructions;
+            }
+        }
+
     }
 }
