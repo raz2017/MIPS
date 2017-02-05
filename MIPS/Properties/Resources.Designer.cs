@@ -61,22 +61,11 @@ namespace MIPS.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0xa1020000
-        ///0x810AFFFC
-        ///0x00831820
-        ///0x01263820
-        ///0x01224820
-        ///0x81180000
-        ///0x81510010
-        ///0x00624022
-        ///0x00000000
-        ///0x00000000
-        ///0x00000000
-        ///0x00000000.
+        ///   Looks up a localized string similar to 10.
         /// </summary>
-        internal static string MIPSInstructions {
+        internal static string Instructions {
             get {
-                return ResourceManager.GetString("MIPSInstructions", resourceCulture);
+                return ResourceManager.GetString("Instructions", resourceCulture);
             }
         }
     }

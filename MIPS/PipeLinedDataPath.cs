@@ -27,6 +27,19 @@ namespace MIPS
         {
             _mainMemoryStorage = new List<int>();
             _registers = new List<int>();
+            
+            ifid_write = InstructionFactory.getInstructionFetchClass();
+            ifid_read = InstructionFactory.getInstructionFetchClass();
+
+            idex_write = InstructionFactory.getInstructionDecodeClass();
+            idex_read = InstructionFactory.getInstructionDecodeClass();
+
+            exmem_write = InstructionFactory.getExecuteStageClass();
+            exmem_read = InstructionFactory.getExecuteStageClass();
+
+            memwb_write = InstructionFactory.getMemoryStageClass();
+            memwb_read = InstructionFactory.getMemoryStageClass();
+
             InitializeMainMemory();
             InitializeRegisters();
 
@@ -41,20 +54,20 @@ namespace MIPS
 
         public void ID_DecodeInstructions()
         {
-            int ReadRegister1 = DecodeInstruction.source_reg1(ifid_read._instruction);
-            int ReadRegister2 = DecodeInstruction.source_reg2(ifid_read._instruction);
-            int WriteRegister = DecodeInstruction.dest_reg(ifid_read._instruction);
+            int readRegister1 = DecodeInstruction.source_reg1(ifid_read._instruction);
+            int readRegister2 = DecodeInstruction.source_reg2(ifid_read._instruction);
+            int writeRegister = DecodeInstruction.dest_reg(ifid_read._instruction);
 
-            idex_write.ReadReg1Value = _registers[ReadRegister1];
-            idex_write.ReadReg2Value = _registers[ReadRegister2];
-            idex_write.WriteReg_20_16 = ReadRegister2;
-            idex_write.WriteReg_15_11 = WriteRegister;
+            idex_write.ReadReg1Value = _registers[readRegister1];
+            idex_write.ReadReg2Value = _registers[readRegister2];
+            idex_write.WriteReg_20_16 = readRegister2;
+            idex_write.WriteReg_15_11 = writeRegister;
             idex_write.SEOffset = DecodeInstruction.offset(ifid_read._instruction);
             idex_write.Function = DecodeInstruction.func_code(idex_write.SEOffset);
 
             if ((DecodeInstruction.is_r_format(ifid_read._instruction)) && 
-                   ( (DecodeInstruction.rfunct(ifid_read._instruction) == "sub") ||
-                    DecodeInstruction.rfunct(ifid_read._instruction) == "add" ))
+                   ( (DecodeInstruction.rfunct(ifid_read._instruction) == Instruction.Subtract) ||
+                    DecodeInstruction.rfunct(ifid_read._instruction) == Instruction.Add))
             {
                 idex_write._regDestination = 1;
                 idex_write._ALUOp = 10;
@@ -65,7 +78,7 @@ namespace MIPS
                 idex_write._MemToReg = 0;
             }
 
-            else if (DecodeInstruction.getOPcode(ifid_read._instruction) == "lb")
+            else if (DecodeInstruction.getOPcode(ifid_read._instruction) == Instruction.LoadByte)
             {
                 idex_write._regDestination = 0;
                 idex_write._ALUOp = 0;
@@ -76,7 +89,7 @@ namespace MIPS
                 idex_write._MemToReg = 1;
             }
 
-            else if (DecodeInstruction.getOPcode(ifid_read._instruction) == "sb")
+            else if (DecodeInstruction.getOPcode(ifid_read._instruction) == Instruction.StoreByte)
             {
                 idex_write._regDestination = 0;
                 idex_write._ALUOp = 0;

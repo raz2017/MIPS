@@ -10,7 +10,7 @@ using MIPS.Properties;
 
 namespace MIPS
 {
-    public class Instructions
+    public class Instructions : IInstructions
     {
         private static List<int> _instructions = new List<int>();
 

@@ -8,31 +8,31 @@ namespace MIPS
 {
     public static class DecodeInstruction
     {
-        public static string rfunct(int x)
+        public static Instruction rfunct(int x)
         {
             switch (x & 0x0000003f)
             {
                 case 0x22:
-                    return "sub";
+                    return Instruction.Subtract;
                 case 0x20:
-                    return "add";
+                    return Instruction.Add;
                 case 0x00:
-                    return "nop";
+                    return Instruction.NOP;
                 default:
-                    return "NotDef";
+                    return Instruction.NotDefined;
             }
         }
 
-        public static string getOPcode(int x)
+        public static Instruction getOPcode(int x)
         {
             switch ((x & 0xFC000000) >> 26)
             {
                 case 0x20:
-                    return "lb";
+                    return Instruction.LoadByte;
                 case 0x28:
-                    return "sb";
+                    return Instruction.StoreByte;
                 default:
-                    return "NotDef";
+                    return Instruction.NotDefined;
             };
         }
 
