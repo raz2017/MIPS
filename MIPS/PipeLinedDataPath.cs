@@ -25,6 +25,8 @@ namespace MIPS
 
         public PipeLinedDataPath(Instructions instructions)
         {
+            _mainMemoryStorage = new List<int>();
+            _registers = new List<int>();
             InitializeMainMemory();
             InitializeRegisters();
 
@@ -192,23 +194,23 @@ namespace MIPS
 
         private void InitializeMainMemory()
         {
-            _mainMemoryStorage.Capacity = 1024;
+ //           _mainMemoryStorage.Capacity = 1024;
 
             for (int i = 0; i < 1024; i++)
-                _mainMemoryStorage[i] = (i & 0xFF);
+                _mainMemoryStorage.Add ( i & 0xFF);
         }
 
         private void InitializeRegisters()
         {
-            _registers.Capacity= 32;
+            //_registers= 32;
 
-            _registers[0] = 0;
+            _registers.Add(0);
             for (int i = 1; i < 32; i++)
-                _registers[i] = 0x100 + i;
+                _registers.Add(0x100 +i ); 
 
         }
 
-        private void ProcessInstructions()
+        public void ProcessInstructions()
         {
             for (int i = 0; i < _instructions.Count(); i++)
             {
