@@ -1,6 +1,6 @@
 ﻿namespace MIPS
 {
-    public enum Instruction
+    public enum InstructionType
     {
         
         Add,

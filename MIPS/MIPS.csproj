@@ -60,17 +60,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DecodeInstruction.cs" />
-    <Compile Include="IInstructions.cs" />
-    <Compile Include="Instruction.cs" />
-    <Compile Include="InstructionFactory.cs" />
-    <Compile Include="Instructions.cs" />
+    <Compile Include="InstructionClasses\InstructionDecoder.cs" />
+    <Compile Include="InstructionClasses\IInstructions.cs" />
+    <Compile Include="InstructionClasses\InstructionType.cs" />
+    <Compile Include="PipelineStageClasses\StageClassFactory.cs" />
+    <Compile Include="InstructionClasses\Instructions.cs" />
     <Compile Include="PipeLinedDataPath.cs" />
     <Compile Include="PipelineStageClasses\InstructionDecodeStage.cs" />
     <Compile Include="PipelineStageClasses\ExecuteStage.cs" />
     <Compile Include="PipelineStageClasses\InstructionFetchStage.cs" />
     <Compile Include="PipelineStageClasses\MemoryStage.cs" />
-    <Compile Include="PipelineStageClasses\WriteBackStage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -106,6 +105,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

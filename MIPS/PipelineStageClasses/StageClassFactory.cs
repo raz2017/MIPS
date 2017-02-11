@@ -7,7 +7,7 @@ using MIPS.PipelineStageClasses;
 
 namespace MIPS
 {
-    public static class InstructionFactory
+    public static class StageClassFactory
     {
         public static InstructionFetchStage getInstructionFetchClass()
         {

@@ -17,10 +17,6 @@ namespace MIPS
              
             PipeLinedDataPath pipe = new PipeLinedDataPath(new Instructions());
             pipe.ProcessInstructions();
-
-
-
-
         }
     }
 }

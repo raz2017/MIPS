@@ -9,8 +9,8 @@ namespace MIPS
 {
     public class PipeLinedDataPath
     {
-        private List<int> _mainMemoryStorage;
-        private List<int> _registers;
+        private int[] _mainMemoryStorage;
+        private int[] _registers;
 
         private InstructionFetchStage ifid_write;
         private InstructionFetchStage ifid_read;
@@ -21,29 +21,27 @@ namespace MIPS
         private MemoryStage memwb_write;
         private MemoryStage memwb_read;
 
-        private readonly List<int> _instructions;
+        private readonly Instructions _instructions;
 
         public PipeLinedDataPath(Instructions instructions)
         {
-            _mainMemoryStorage = new List<int>();
-            _registers = new List<int>();
-            
-            ifid_write = InstructionFactory.getInstructionFetchClass();
-            ifid_read = InstructionFactory.getInstructionFetchClass();
+          
+            ifid_write = StageClassFactory.getInstructionFetchClass();
+            ifid_read = StageClassFactory.getInstructionFetchClass();
 
-            idex_write = InstructionFactory.getInstructionDecodeClass();
-            idex_read = InstructionFactory.getInstructionDecodeClass();
+            idex_write = StageClassFactory.getInstructionDecodeClass();
+            idex_read = StageClassFactory.getInstructionDecodeClass();
 
-            exmem_write = InstructionFactory.getExecuteStageClass();
-            exmem_read = InstructionFactory.getExecuteStageClass();
+            exmem_write = StageClassFactory.getExecuteStageClass();
+            exmem_read = StageClassFactory.getExecuteStageClass();
 
-            memwb_write = InstructionFactory.getMemoryStageClass();
-            memwb_read = InstructionFactory.getMemoryStageClass();
+            memwb_write = StageClassFactory.getMemoryStageClass();
+            memwb_read = StageClassFactory.getMemoryStageClass();
 
             InitializeMainMemory();
             InitializeRegisters();
 
-            _instructions = instructions.mipsInstructions;
+            _instructions = instructions;
         }
 
         public void IF_FetchInstructions(int instruction)
@@ -54,20 +52,20 @@ namespace MIPS
 
         public void ID_DecodeInstructions()
         {
-            int readRegister1 = DecodeInstruction.source_reg1(ifid_read._instruction);
-            int readRegister2 = DecodeInstruction.source_reg2(ifid_read._instruction);
-            int writeRegister = DecodeInstruction.dest_reg(ifid_read._instruction);
+            int readRegister1 = InstructionDecoder.source_reg1(ifid_read._instruction);
+            int readRegister2 = InstructionDecoder.source_reg2(ifid_read._instruction);
+            int writeRegister = InstructionDecoder.dest_reg(ifid_read._instruction);
 
             idex_write.ReadReg1Value = _registers[readRegister1];
             idex_write.ReadReg2Value = _registers[readRegister2];
             idex_write.WriteReg_20_16 = readRegister2;
             idex_write.WriteReg_15_11 = writeRegister;
-            idex_write.SEOffset = DecodeInstruction.offset(ifid_read._instruction);
-            idex_write.Function = DecodeInstruction.func_code(idex_write.SEOffset);
+            idex_write.SEOffset = InstructionDecoder.offset(ifid_read._instruction);
+            idex_write.Function = InstructionDecoder.func_code(idex_write.SEOffset);
 
-            if ((DecodeInstruction.is_r_format(ifid_read._instruction)) && 
-                   ( (DecodeInstruction.rfunct(ifid_read._instruction) == Instruction.Subtract) ||
-                    DecodeInstruction.rfunct(ifid_read._instruction) == Instruction.Add))
+            if ((InstructionDecoder.is_r_format(ifid_read._instruction)) && 
+                   ( (InstructionDecoder.rfunct(ifid_read._instruction) == InstructionType.Subtract) ||
+                    InstructionDecoder.rfunct(ifid_read._instruction) == InstructionType.Add))
             {
                 idex_write._regDestination = 1;
                 idex_write._ALUOp = 10;
@@ -78,7 +76,7 @@ namespace MIPS
                 idex_write._MemToReg = 0;
             }
 
-            else if (DecodeInstruction.getOPcode(ifid_read._instruction) == Instruction.LoadByte)
+            else if (InstructionDecoder.getOPcode(ifid_read._instruction) == InstructionType.LoadByte)
             {
                 idex_write._regDestination = 0;
                 idex_write._ALUOp = 0;
@@ -89,7 +87,7 @@ namespace MIPS
                 idex_write._MemToReg = 1;
             }
 
-            else if (DecodeInstruction.getOPcode(ifid_read._instruction) == Instruction.StoreByte)
+            else if (InstructionDecoder.getOPcode(ifid_read._instruction) == InstructionType.StoreByte)
             {
                 idex_write._regDestination = 0;
                 idex_write._ALUOp = 0;
@@ -135,29 +133,29 @@ namespace MIPS
                 SecondALUOperand = idex_read.ReadReg2Value;
             }
 
-            int ALUControlInput = 0;
+            int aluControlInput = 0;
             if (idex_read._ALUOp == 0)
             {
-                ALUControlInput = 10;
+                aluControlInput = 10;
             }
 
             if (idex_read._ALUOp == 10)
             {
                 if (idex_read.Function == 0x20)
                 {
-                    ALUControlInput = 10;
+                    aluControlInput = 10;
                 }
                 if (idex_read.Function == 0x22)
                 {
-                    ALUControlInput = 110;
+                    aluControlInput = 110;
                 }
             }
 
-            if (ALUControlInput == 10)
+            if (aluControlInput == 10)
             {
                 exmem_write.ALUResult = idex_read.ReadReg1Value + SecondALUOperand;
             }
-            if (ALUControlInput == 110)
+            if (aluControlInput == 110)
             {
                 exmem_write.ALUResult = idex_read.ReadReg1Value - SecondALUOperand;
             }
@@ -207,27 +205,27 @@ namespace MIPS
 
         private void InitializeMainMemory()
         {
- //           _mainMemoryStorage.Capacity = 1024;
 
+            _mainMemoryStorage = new int[1024];
             for (int i = 0; i < 1024; i++)
-                _mainMemoryStorage.Add ( i & 0xFF);
+                _mainMemoryStorage[i]= ( i & 0xFF);
         }
 
         private void InitializeRegisters()
         {
-            //_registers= 32;
 
-            _registers.Add(0);
+            _registers = new int[32];
+            _registers[0] = 0;
             for (int i = 1; i < 32; i++)
-                _registers.Add(0x100 +i ); 
+                _registers[i] = (0x100 +i ); 
 
         }
 
         public void ProcessInstructions()
         {
-            for (int i = 0; i < _instructions.Count(); i++)
+            for (int i = 0; i < _instructions.mipsInstructions.Count(); i++)
             {
-                IF_FetchInstructions(_instructions[i]);
+                IF_FetchInstructions(_instructions.mipsInstructions[i]);
                 ID_DecodeInstructions();
                 EX_ExecuteInstructions();
                 MEM_LoadValueFromMemory();

@@ -6,33 +6,33 @@ using System.Threading.Tasks;
 
 namespace MIPS
 {
-    public static class DecodeInstruction
+    public static class InstructionDecoder
     {
-        public static Instruction rfunct(int x)
+        public static InstructionType rfunct(int x)
         {
             switch (x & 0x0000003f)
             {
                 case 0x22:
-                    return Instruction.Subtract;
+                    return InstructionType.Subtract;
                 case 0x20:
-                    return Instruction.Add;
+                    return InstructionType.Add;
                 case 0x00:
-                    return Instruction.NOP;
+                    return InstructionType.NOP;
                 default:
-                    return Instruction.NotDefined;
+                    return InstructionType.NotDefined;
             }
         }
 
-        public static Instruction getOPcode(int x)
+        public static InstructionType getOPcode(int x)
         {
             switch ((x & 0xFC000000) >> 26)
             {
                 case 0x20:
-                    return Instruction.LoadByte;
+                    return InstructionType.LoadByte;
                 case 0x28:
-                    return Instruction.StoreByte;
+                    return InstructionType.StoreByte;
                 default:
-                    return Instruction.NotDefined;
+                    return InstructionType.NotDefined;
             };
         }
 
