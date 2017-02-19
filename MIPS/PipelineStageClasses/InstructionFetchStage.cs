@@ -1,12 +1,31 @@
-﻿namespace MIPS.PipelineStageClasses
+﻿using System.Collections.Generic;
+
+namespace MIPS.PipelineStageClasses
 {
     public class InstructionFetchStage
     {
-        public int _instruction;
+        private int _currentInstruction;
+        public List<int> _instructions;
 
-        public InstructionFetchStage()
+        public InstructionFetchStage(Instructions instructions)
         {
-            _instruction = 0;
+            _currentInstruction = 0;
+            _instructions = instructions.mipsInstructions;
         }
+
+        public void FetchInstruction(int instructionIndex)
+        {
+            _currentInstruction = _instructions[instructionIndex];
+        }
+
+        public int CurrentInstruction
+        {
+            get
+            {
+                return _currentInstruction;
+                
+            }
+        }
+        
     }
 }

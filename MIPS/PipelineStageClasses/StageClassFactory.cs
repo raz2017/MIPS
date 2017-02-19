@@ -9,9 +9,9 @@ namespace MIPS
 {
     public static class StageClassFactory
     {
-        public static InstructionFetchStage getInstructionFetchClass()
+        public static InstructionFetchStage getInstructionFetchClass(Instructions instructions)
         {
-            return new InstructionFetchStage();
+            return new InstructionFetchStage(instructions);
         }
 
         public static InstructionDecodeStage getInstructionDecodeClass()

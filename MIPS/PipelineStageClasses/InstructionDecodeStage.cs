@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,5 +35,71 @@ namespace MIPS.PipelineStageClasses
         }
 
 
+        public void SetRegisterValues(int currentInstruction, int[] registers)
+        {
+            int readRegister1 = InstructionDecoder.source_reg1(currentInstruction);
+            int readRegister2 = InstructionDecoder.source_reg2(currentInstruction);
+            int writeRegister = InstructionDecoder.dest_reg(currentInstruction);
+
+
+            ReadReg1Value = registers[readRegister1];
+            ReadReg2Value = registers[readRegister2];
+            WriteReg_20_16 = readRegister2;
+            WriteReg_15_11 = writeRegister;
+            SEOffset = InstructionDecoder.offset(currentInstruction);
+            Function = InstructionDecoder.func_code(SEOffset);
+
+        }
+
+        public void SetExecutionPath(int currentinstruction)
+        {
+            if ((InstructionDecoder.is_r_format(currentinstruction)) &&
+                ((InstructionDecoder.rfunct(currentinstruction) == InstructionType.Subtract) ||
+                 InstructionDecoder.rfunct(currentinstruction) == InstructionType.Add))
+            {
+                _regDestination = 1;
+                _ALUOp = 10;
+                _ALUSrc = 0;
+                _MemRead = 0;
+                _MemWrite = 0;
+                _RegWrite = 1;
+                _MemToReg = 0;
+            }
+
+            else if (InstructionDecoder.getOPcode(currentinstruction) == InstructionType.LoadByte)
+            {
+                _regDestination = 0;
+                _ALUOp = 0;
+                _ALUSrc = 1;
+                _MemRead = 1;
+                _MemWrite = 0;
+                _RegWrite = 1;
+                _MemToReg = 1;
+            }
+
+            else if (InstructionDecoder.getOPcode(currentinstruction) == InstructionType.StoreByte)
+            {
+                _regDestination = 0;
+                _ALUOp = 0;
+                _ALUSrc = 1;
+                _MemRead = 0;
+                _MemWrite = 1;
+                _RegWrite = 0;
+                _MemToReg = 0;
+            }
+
+            else
+            {
+                _regDestination = 0;
+                _ALUOp = 0;
+                _ALUSrc = 0;
+                _MemRead = 0;
+                _MemWrite = 0;
+                _RegWrite = 0;
+                _MemToReg = 0;
+            }
+
+
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace MIPS
     {
         private int[] _mainMemoryStorage;
         private int[] _registers;
+        private int _instructionIndex;
 
         private InstructionFetchStage ifid_write;
         private InstructionFetchStage ifid_read;
@@ -25,9 +26,9 @@ namespace MIPS
 
         public PipeLinedDataPath(Instructions instructions)
         {
-          
-            ifid_write = StageClassFactory.getInstructionFetchClass();
-            ifid_read = StageClassFactory.getInstructionFetchClass();
+        
+            ifid_write = StageClassFactory.getInstructionFetchClass(instructions);
+            ifid_read = StageClassFactory.getInstructionFetchClass(instructions);
 
             idex_write = StageClassFactory.getInstructionDecodeClass();
             idex_read = StageClassFactory.getInstructionDecodeClass();
@@ -42,72 +43,22 @@ namespace MIPS
             InitializeRegisters();
 
             _instructions = instructions;
+            _instructionIndex = 0;
         }
 
-        public void IF_FetchInstructions(int instruction)
+        public void IF_FetchInstructions()
         {
-            ifid_write._instruction = instruction;
+            ifid_write.FetchInstruction(_instructionIndex);
+            _instructionIndex++;
 
         }
 
         public void ID_DecodeInstructions()
         {
-            int readRegister1 = InstructionDecoder.source_reg1(ifid_read._instruction);
-            int readRegister2 = InstructionDecoder.source_reg2(ifid_read._instruction);
-            int writeRegister = InstructionDecoder.dest_reg(ifid_read._instruction);
 
-            idex_write.ReadReg1Value = _registers[readRegister1];
-            idex_write.ReadReg2Value = _registers[readRegister2];
-            idex_write.WriteReg_20_16 = readRegister2;
-            idex_write.WriteReg_15_11 = writeRegister;
-            idex_write.SEOffset = InstructionDecoder.offset(ifid_read._instruction);
-            idex_write.Function = InstructionDecoder.func_code(idex_write.SEOffset);
+            idex_write.SetRegisterValues(ifid_read.CurrentInstruction,_registers );
 
-            if ((InstructionDecoder.is_r_format(ifid_read._instruction)) && 
-                   ( (InstructionDecoder.rfunct(ifid_read._instruction) == InstructionType.Subtract) ||
-                    InstructionDecoder.rfunct(ifid_read._instruction) == InstructionType.Add))
-            {
-                idex_write._regDestination = 1;
-                idex_write._ALUOp = 10;
-                idex_write._ALUSrc = 0;
-                idex_write._MemRead = 0;
-                idex_write._MemWrite = 0;
-                idex_write._RegWrite = 1;
-                idex_write._MemToReg = 0;
-            }
-
-            else if (InstructionDecoder.getOPcode(ifid_read._instruction) == InstructionType.LoadByte)
-            {
-                idex_write._regDestination = 0;
-                idex_write._ALUOp = 0;
-                idex_write._ALUSrc = 1;
-                idex_write._MemRead = 1;
-                idex_write._MemWrite = 0;
-                idex_write._RegWrite = 1;
-                idex_write._MemToReg = 1;
-            }
-
-            else if (InstructionDecoder.getOPcode(ifid_read._instruction) == InstructionType.StoreByte)
-            {
-                idex_write._regDestination = 0;
-                idex_write._ALUOp = 0;
-                idex_write._ALUSrc = 1;
-                idex_write._MemRead = 0;
-                idex_write._MemWrite = 1;
-                idex_write._RegWrite = 0;
-                idex_write._MemToReg = 0;
-            }
-
-            else
-            {
-                idex_write._regDestination = 0;
-                idex_write._ALUOp = 0;
-                idex_write._ALUSrc = 0;
-                idex_write._MemRead = 0;
-                idex_write._MemWrite = 0;
-                idex_write._RegWrite = 0;
-                idex_write._MemToReg = 0;
-            }
+            idex_write.SetExecutionPath(ifid_read.CurrentInstruction);
 
         }
 
@@ -223,9 +174,9 @@ namespace MIPS
 
         public void ProcessInstructions()
         {
-            for (int i = 0; i < _instructions.mipsInstructions.Count(); i++)
+            foreach (var instruction in  _instructions.mipsInstructions)
             {
-                IF_FetchInstructions(_instructions.mipsInstructions[i]);
+                IF_FetchInstructions();
                 ID_DecodeInstructions();
                 EX_ExecuteInstructions();
                 MEM_LoadValueFromMemory();
