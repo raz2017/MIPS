@@ -64,65 +64,29 @@ namespace MIPS
         public void EX_ExecuteInstructions()
         {
             //Control signals
-            if (pipelineStage.idex_read._regDestination == 1)
-            {
-                pipelineStage.exmem_write.WriteRegNum = pipelineStage.idex_read.WriteReg_15_11;
-            }
-            if (pipelineStage.idex_read._regDestination == 0)
-            {
-                pipelineStage.exmem_write.WriteRegNum = pipelineStage.idex_read.WriteReg_20_16;
-            }
+
+            pipelineStage.exmem_write.SetWriteRegisterNumber(pipelineStage.idex_read); 
 
             //ALUSrc
 
             int SecondALUOperand = 0;
-            if (pipelineStage.idex_read._ALUSrc == 1)
-            {
-                SecondALUOperand = pipelineStage.idex_read.SEOffset;
-            }
-
-            if (pipelineStage.idex_read._ALUSrc == 0)
-            {
-                SecondALUOperand = pipelineStage.idex_read.ReadReg2Value;
-            }
+            SecondALUOperand = pipelineStage.idex_read._ALUSrc == 1
+                ? pipelineStage.idex_read.SEOffset
+                : pipelineStage.idex_read.ReadReg2Value;
+            
 
             //ALUOp
 
             int aluControlInput = 0;
-            if (pipelineStage.idex_read._ALUOp == 0)
-            {
-                aluControlInput = 10;
-            }
-
-            if (pipelineStage.idex_read._ALUOp == 10)
-            {
-                if (pipelineStage.idex_read.Function == 0x20)
-                {
-                    aluControlInput = 10;
-                }
-                if (pipelineStage.idex_read.Function == 0x22)
-                {
-                    aluControlInput = 110;
-                }
-            }
+            aluControlInput = pipelineStage.idex_read.GetALUControlInput();
 
             //ALU
-            if (aluControlInput == 10)
-            {
-                pipelineStage.exmem_write.ALUResult = pipelineStage.idex_read.ReadReg1Value + SecondALUOperand;
-            }
-            if (aluControlInput == 110)
-            {
-                pipelineStage.exmem_write.ALUResult = pipelineStage.idex_read.ReadReg1Value - SecondALUOperand;
-            }
+            pipelineStage.exmem_write.SetALUResult(pipelineStage.idex_read, SecondALUOperand , aluControlInput);
 
-            //Store word value
-            pipelineStage.exmem_write.SWvalue = pipelineStage.idex_read.ReadReg2Value;
+            //Store word value just pass values from IDEX Read pipeline
 
-            pipelineStage.exmem_write.MemRead = pipelineStage.idex_read._MemRead;
-            pipelineStage.exmem_write.MemWrite = pipelineStage.idex_read._MemWrite;
-            pipelineStage.exmem_write.MemToReg = pipelineStage.idex_read._MemToReg;
-            pipelineStage.exmem_write.RegWrite = pipelineStage.idex_read._RegWrite;
+            pipelineStage.exmem_write.SetMemoryControlsBits(pipelineStage.idex_read);
+
         }
 
         /// <summary>
@@ -136,14 +100,11 @@ namespace MIPS
             //Control Signals
             //R-Type should be NOP
             if (pipelineStage.exmem_write.MemRead == 1)
-            {
                 pipelineStage.memwb_write.LWDataValue = _mainMemoryStorage[pipelineStage.exmem_read.ALUResult];
-            }
 
             if (pipelineStage.exmem_read.MemWrite == 1)
-            {
                 _mainMemoryStorage[pipelineStage.exmem_read.ALUResult] = pipelineStage.exmem_read.SWvalue;
-            }
+
 
             pipelineStage.memwb_write.RegWrite = pipelineStage.exmem_read.RegWrite;
             pipelineStage.memwb_write.MemToReg = pipelineStage.exmem_read.MemToReg;

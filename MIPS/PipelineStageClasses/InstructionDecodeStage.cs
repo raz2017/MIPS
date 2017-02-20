@@ -101,5 +101,20 @@ namespace MIPS.PipelineStageClasses
 
 
         }
+
+        public int GetALUControlInput()
+        {
+            int aluControlInput = 0;
+
+            //I-type instruction or R-Type Add instruction
+            if (this._ALUOp == 0 || (this._ALUOp == 10 && this.Function == 0x20))
+                aluControlInput = 10; //ADD
+
+            //R-Type Subtract instruction
+            if (this._ALUOp == 10 && this.Function == 0x22)
+                aluControlInput = 110; //SUBTRACT
+ 
+            return aluControlInput;
+        }
     }
 }
