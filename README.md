@@ -7,8 +7,5 @@ but this just makes an instance PipeLinedDataPath and executes the pipeline stag
 
 I decided to rewrite a MIPS program I wrote about a year ago in C++ . I had included everything in one file to make grading easier in that case. I included the output and code under MIPSC++ . 
 
-I was using git through Visual Studio so it looks like it created multiple vcs files. This is not preventing the program from running, but
-I'm going to clean up these files soon.
-
 I am still working on the unit tests, but I got a couple of them working correctly. 
 
