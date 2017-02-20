@@ -6,8 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-//TODO Come up with a good design for the classes
-//TODO Create unit tests
 namespace MIPS
 {
     class Program

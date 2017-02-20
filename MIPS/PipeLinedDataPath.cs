@@ -15,9 +15,9 @@ namespace MIPS
 
         private PipeLineStagesContainer pipelineStage;
 
-        private readonly Instructions _instructions;
+        private readonly IInstructions _instructions;
 
-        public PipeLinedDataPath(Instructions instructions)
+        public PipeLinedDataPath(IInstructions instructions)
         {
         
             pipelineStage = new PipeLineStagesContainer(instructions);
@@ -161,7 +161,7 @@ namespace MIPS
 
         private void PrintRegisterValues()
         {
-            
+            //Todo after writing unit and system tests
         }
 
         private void CopyWriteToReadValues()

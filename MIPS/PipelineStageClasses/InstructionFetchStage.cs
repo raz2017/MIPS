@@ -7,7 +7,7 @@ namespace MIPS.PipelineStageClasses
         private int _currentInstruction;
         public List<int> _instructions;
 
-        public InstructionFetchStage(Instructions instructions)
+        public InstructionFetchStage(IInstructions instructions)
         {
             _currentInstruction = 0;
             _instructions = instructions.mipsInstructions;

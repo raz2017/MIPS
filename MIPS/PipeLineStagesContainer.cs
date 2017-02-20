@@ -18,7 +18,7 @@ namespace MIPS
         public MemoryStage memwb_write;
         public MemoryStage memwb_read;
 
-        public PipeLineStagesContainer(Instructions instructions)
+        public PipeLineStagesContainer(IInstructions instructions)
         {
 
             ifid_write = StageClassFactory.getInstructionFetchClass(instructions);

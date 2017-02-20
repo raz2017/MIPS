@@ -7,13 +7,30 @@ using NUnit.Framework;
 
 namespace MIPS
 {
-    class UnitTests
-    {
-        //Test random initial register values
-        //Test random initial Main Memory Values
+    //class UnitTests
+    //{
+    //    //Test random initial register values
+    //    //Test random initial Main Memory Values
 
         
 
+    //}
+
+    public class TestInstructions : IInstructions
+    {
+        public List<int> mipsInstructions { get; set; }
+    }
+
+    [TestFixture]
+
+    public class MainMemoryInitializationTest
+    {
+        
+    }
+
+    public class RegistersInitializationTest
+    {
+        
     }
 
     [TestFixture]
@@ -40,4 +57,31 @@ namespace MIPS
             }
         }
     }
+
+
+    [TestFixture]
+    public class SystemRegisterTest
+    {
+
+        private IInstructions _instructionList = new TestInstructions()
+        {
+            mipsInstructions = new List<int>()
+            {
+                0x00a63820,
+                0x00625022
+            }
+        };
+
+        [Test]
+        public void TestOneInstruction()
+        {
+
+            PipeLinedDataPath pipeLineTest = new PipeLinedDataPath(_instructionList);
+
+            pipeLineTest.ProcessInstructions();
+
+        }
+    }
+
+
 }
