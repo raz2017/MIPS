@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MIPS.MainMemoryAndRegisters;
 using MIPS.PipelineStageClasses;
+
 
 namespace MIPS
 {
     public class PipeLinedDataPath
     {
-        private int[] _mainMemoryStorage;
-        private int[] _registers;
+        private MainMemory mainMemory;
+        private Registers registers;
+
         private int _instructionIndex;
 
         private PipeLineStagesContainer pipelineStage;
@@ -50,7 +53,7 @@ namespace MIPS
            //No control signals here, we decode instruction
            //Figure out what the control bits are going to be for instruction
 
-            pipelineStage.idex_write.SetRegisterValues(pipelineStage.ifid_read.CurrentInstruction,_registers );
+            pipelineStage.idex_write.SetRegisterValues(pipelineStage.ifid_read.CurrentInstruction,registers.regValues);
             pipelineStage.idex_write.SetExecutionPath(pipelineStage.ifid_read.CurrentInstruction);
 
         }
@@ -102,11 +105,11 @@ namespace MIPS
 
             //Read from Main Memory
             if (pipelineStage.exmem_write.MemRead == 1)
-                pipelineStage.memwb_write.LWDataValue = _mainMemoryStorage[pipelineStage.exmem_read.ALUResult];
+                pipelineStage.memwb_write.LWDataValue = mainMemory.memValues[pipelineStage.exmem_read.ALUResult];
 
             //Write to Main Memory
             if (pipelineStage.exmem_read.MemWrite == 1)
-                _mainMemoryStorage[pipelineStage.exmem_read.ALUResult] = pipelineStage.exmem_read.SWvalue;
+                mainMemory.memValues[pipelineStage.exmem_read.ALUResult] = pipelineStage.exmem_read.SWvalue;
 
             pipelineStage.memwb_write.SetWriteBackValues(pipelineStage.exmem_read);
         }
@@ -119,7 +122,7 @@ namespace MIPS
             //SB shouldn't do anything here
             if (pipelineStage.memwb_read.RegWrite == 1)
 
-                _registers[pipelineStage.memwb_read.WriteRegNum] = pipelineStage.memwb_read.MemToReg == 1
+                registers.regValues[pipelineStage.memwb_read.WriteRegNum] = pipelineStage.memwb_read.MemToReg == 1
                     ? pipelineStage.memwb_read.LWDataValue
                     : pipelineStage.memwb_read.ALUResult;
             
@@ -127,20 +130,13 @@ namespace MIPS
 
         private void InitializeMainMemory()
         {
-
-            _mainMemoryStorage = new int[1024];
-            for (int i = 0; i < 1024; i++)
-                _mainMemoryStorage[i]= ( i & 0xFF);
+            mainMemory = new MainMemory();
         }
 
         private void InitializeRegisters()
         {
-
-            _registers = new int[32];
-            _registers[0] = 0;
-            for (int i = 1; i < 32; i++)
-                _registers[i] = (0x100 +i ); 
-
+            registers = new Registers();
+           
         }
 
         public void ProcessInstructions()

@@ -67,6 +67,8 @@
     <Compile Include="InstructionClasses\InstructionDecoder.cs" />
     <Compile Include="InstructionClasses\IInstructions.cs" />
     <Compile Include="InstructionClasses\InstructionType.cs" />
+    <Compile Include="MainMemoryAndRegisters\MainMemory.cs" />
+    <Compile Include="MainMemoryAndRegisters\Registers.cs" />
     <Compile Include="PipelineStageClasses\StageClassFactory.cs" />
     <Compile Include="InstructionClasses\Instructions.cs" />
     <Compile Include="PipeLinedDataPath.cs" />
