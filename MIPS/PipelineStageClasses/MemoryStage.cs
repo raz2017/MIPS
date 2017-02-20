@@ -21,5 +21,14 @@ namespace MIPS.PipelineStageClasses
             LWDataValue = ALUResult = WriteRegNum = 0;
 
         }
+
+        public void SetWriteBackValues(ExecuteStage exmemRead)
+        {
+            this.RegWrite = exmemRead.RegWrite;
+            this.MemToReg = exmemRead.MemToReg;
+
+            this.ALUResult = exmemRead.ALUResult;
+            this.WriteRegNum = exmemRead.WriteRegNum;
+        }
     }
 }

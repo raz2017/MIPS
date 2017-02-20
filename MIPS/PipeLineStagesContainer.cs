@@ -34,5 +34,13 @@ namespace MIPS
             memwb_read = StageClassFactory.getMemoryStageClass();
 
         }
+
+        public void CopyWriteToReadValues()
+        {
+            ifid_read = ifid_write;
+            idex_read = idex_write;
+            exmem_read = exmem_write;
+            memwb_read = memwb_write;
+        }
     }
 }

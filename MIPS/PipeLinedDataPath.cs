@@ -90,7 +90,7 @@ namespace MIPS
         }
 
         /// <summary>
-        /// 1. If the instruction is a "load byte", the user the address calculated in the previous
+        /// 1. If the instruction is a "load byte", the use the address calculated in the previous
         /// stage as an index into the Main Memory array and get value. 
         /// 2. Otherwise, just pass information from the read version of the previous stage (EX/MEM) pipeline register
         /// to the WRITE version fof the MEM/WB.
@@ -99,19 +99,16 @@ namespace MIPS
         {
             //Control Signals
             //R-Type should be NOP
+
+            //Read from Main Memory
             if (pipelineStage.exmem_write.MemRead == 1)
                 pipelineStage.memwb_write.LWDataValue = _mainMemoryStorage[pipelineStage.exmem_read.ALUResult];
 
+            //Write to Main Memory
             if (pipelineStage.exmem_read.MemWrite == 1)
                 _mainMemoryStorage[pipelineStage.exmem_read.ALUResult] = pipelineStage.exmem_read.SWvalue;
 
-
-            pipelineStage.memwb_write.RegWrite = pipelineStage.exmem_read.RegWrite;
-            pipelineStage.memwb_write.MemToReg = pipelineStage.exmem_read.MemToReg;
-
-            pipelineStage.memwb_write.ALUResult = pipelineStage.exmem_read.ALUResult;
-            pipelineStage.memwb_write.WriteRegNum = pipelineStage.exmem_read.WriteRegNum;
-
+            pipelineStage.memwb_write.SetWriteBackValues(pipelineStage.exmem_read);
         }
         
         /// <summary>
@@ -121,16 +118,11 @@ namespace MIPS
         {
             //SB shouldn't do anything here
             if (pipelineStage.memwb_read.RegWrite == 1)
-            {
-                if (pipelineStage.memwb_read.MemToReg == 0)
-                {
-                    _registers[pipelineStage.memwb_read.WriteRegNum] = pipelineStage.memwb_read.ALUResult;
-                }
-                if (pipelineStage.memwb_read.MemToReg == 1)
-                {
-                    _registers[pipelineStage.memwb_read.WriteRegNum] = pipelineStage.memwb_read.LWDataValue;
-                }
-            }
+
+                _registers[pipelineStage.memwb_read.WriteRegNum] = pipelineStage.memwb_read.MemToReg == 1
+                    ? pipelineStage.memwb_read.LWDataValue
+                    : pipelineStage.memwb_read.ALUResult;
+            
         }
 
         private void InitializeMainMemory()
@@ -162,7 +154,6 @@ namespace MIPS
                 WB_StoreValuesToRegisters();
 
                 PrintRegisterValues();
-
                 CopyWriteToReadValues();
 
             }
@@ -175,10 +166,7 @@ namespace MIPS
 
         private void CopyWriteToReadValues()
         {
-            pipelineStage.ifid_read = pipelineStage.ifid_write;
-            pipelineStage.idex_read = pipelineStage.idex_write;
-            pipelineStage.exmem_read = pipelineStage.exmem_write;
-            pipelineStage.memwb_read = pipelineStage.memwb_write;
+            pipelineStage.CopyWriteToReadValues();
         }
 
     }
