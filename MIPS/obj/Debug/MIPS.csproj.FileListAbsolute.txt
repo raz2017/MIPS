@@ -22,3 +22,5 @@ C:\Users\razie\Downloads\MIPS\MIPS\bin\Debug\MIPS.pdb
 C:\Users\razie\Downloads\MIPS\MIPS\obj\Debug\MIPS.csprojResolveAssemblyReference.cache
 C:\Users\razie\Downloads\MIPS\MIPS\obj\Debug\MIPS.Properties.Resources.resources
 C:\Users\razie\Downloads\MIPS\MIPS\obj\Debug\MIPS.csproj.GenerateResource.Cache
+C:\Users\razie\Downloads\MIPS\MIPS\MIPS\bin\Debug\nunit.framework.dll
+C:\Users\razie\Downloads\MIPS\MIPS\MIPS\bin\Debug\nunit.framework.xml

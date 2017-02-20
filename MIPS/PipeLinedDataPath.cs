@@ -28,24 +28,42 @@ namespace MIPS
             _instructions = instructions;
             _instructionIndex = 0;
         }
-
+        /// <summary>
+        /// Read next instruction from instruction cache.
+        /// Put it in the WRITE version of the IF/ID pipeline register.
+        /// </summary>
         public void IF_FetchInstructions()
         {
+            
             pipelineStage.ifid_write.FetchInstruction(_instructionIndex);
             _instructionIndex++;
 
         }
-
+        
+        /// <summary>
+        /// 1. Read instruction from the READ version of the IF/ID pipeline register.
+        /// 2. Do the decoding and register fetching
+        /// 3. Write the values to the WRITE version of the ID/EX pipeline register
+        /// </summary>
         public void ID_DecodeInstructions()
         {
+           //No control signals here, we decode instruction
+           //Figure out what the control bits are going to be for instruction
 
             pipelineStage.idex_write.SetRegisterValues(pipelineStage.ifid_read.CurrentInstruction,_registers );
             pipelineStage.idex_write.SetExecutionPath(pipelineStage.ifid_read.CurrentInstruction);
 
         }
 
+        /// <summary>
+        /// 1. Perform the requested instruction on the operands we got from the READ
+        /// version of the IDEX pipeline register
+        /// 2. Then write the appropripate values to the WRITE version of the EX/MEM pipeline
+        /// register.
+        /// </summary>
         public void EX_ExecuteInstructions()
         {
+            //Control signals
             if (pipelineStage.idex_read._regDestination == 1)
             {
                 pipelineStage.exmem_write.WriteRegNum = pipelineStage.idex_read.WriteReg_15_11;
@@ -54,6 +72,8 @@ namespace MIPS
             {
                 pipelineStage.exmem_write.WriteRegNum = pipelineStage.idex_read.WriteReg_20_16;
             }
+
+            //ALUSrc
 
             int SecondALUOperand = 0;
             if (pipelineStage.idex_read._ALUSrc == 1)
@@ -65,6 +85,8 @@ namespace MIPS
             {
                 SecondALUOperand = pipelineStage.idex_read.ReadReg2Value;
             }
+
+            //ALUOp
 
             int aluControlInput = 0;
             if (pipelineStage.idex_read._ALUOp == 0)
@@ -84,6 +106,7 @@ namespace MIPS
                 }
             }
 
+            //ALU
             if (aluControlInput == 10)
             {
                 pipelineStage.exmem_write.ALUResult = pipelineStage.idex_read.ReadReg1Value + SecondALUOperand;
@@ -93,6 +116,7 @@ namespace MIPS
                 pipelineStage.exmem_write.ALUResult = pipelineStage.idex_read.ReadReg1Value - SecondALUOperand;
             }
 
+            //Store word value
             pipelineStage.exmem_write.SWvalue = pipelineStage.idex_read.ReadReg2Value;
 
             pipelineStage.exmem_write.MemRead = pipelineStage.idex_read._MemRead;
@@ -101,8 +125,16 @@ namespace MIPS
             pipelineStage.exmem_write.RegWrite = pipelineStage.idex_read._RegWrite;
         }
 
+        /// <summary>
+        /// 1. If the instruction is a "load byte", the user the address calculated in the previous
+        /// stage as an index into the Main Memory array and get value. 
+        /// 2. Otherwise, just pass information from the read version of the previous stage (EX/MEM) pipeline register
+        /// to the WRITE version fof the MEM/WB.
+        /// </summary>
         public void MEM_LoadValueFromMemory()
         {
+            //Control Signals
+            //R-Type should be NOP
             if (pipelineStage.exmem_write.MemRead == 1)
             {
                 pipelineStage.memwb_write.LWDataValue = _mainMemoryStorage[pipelineStage.exmem_read.ALUResult];
@@ -120,9 +152,13 @@ namespace MIPS
             pipelineStage.memwb_write.WriteRegNum = pipelineStage.exmem_read.WriteRegNum;
 
         }
-
+        
+        /// <summary>
+        /// Write to the registers based on information we read from the READ version of MEM/WB
+        /// </summary>
         public void WB_StoreValuesToRegisters()
         {
+            //SB shouldn't do anything here
             if (pipelineStage.memwb_read.RegWrite == 1)
             {
                 if (pipelineStage.memwb_read.MemToReg == 0)

@@ -3,3 +3,6 @@
 ################################################################################
 
 /MIPS/bin/Debug/nunit.framework.xml
+/MIPS/bin/Debug/nunit.framework.dll
+/MIPS/packages.config
+/packages/NUnit.3.6.0
